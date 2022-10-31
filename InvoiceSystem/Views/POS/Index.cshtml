@@ -1,0 +1,296 @@
+﻿@model System.Data.DataTable
+
+@{
+    ViewData["Title"] = "POS Billing";
+}
+
+<div class="container bg card p-2">
+    @using(Html.BeginForm("CreateNewInvoice", "POS"))
+     {
+
+            
+    @* Date & Time *@
+    <div class="row">
+        <div class="col-md-6">
+            <table style="border: 0" width="100%">
+                <tr>
+                    <td>Date</td>
+                    <td>
+                        <input type="text" class="form-control" id="TodayDate" name="InvoiceDate" readonly/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Time</td>
+                    <td>
+                        <input type="text" class="form-control" id="CurrentTime" name="Time" readonly/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+     
+     <hr />
+      
+    @* Product Info & Add to Bill *@
+    <div class="row mb-2">
+
+        @* Product Name *@
+        <div class="col-md-3">
+            <label>Item</label>
+            <select class="form-control" id="ProductId">
+                <option selected disabled>Select Product</option>
+                @for (int i = 0; i < Model.Rows.Count; i++)
+                {
+                    <option value="@Model.Rows[i][0]">@Model.Rows[i][1]</option>
+                }
+            </select>
+        </div>
+
+        @* Quantity *@
+        <div class="col-md-3">
+            <label>Quantity</label>
+            <input type="number" class="form-control" id="Quantity"/>
+        </div>
+
+        @* Unit Price *@
+        <div class="col-md-3">
+            <label>Unit Price</label>
+            <input type="number" class="form-control" id="UnitPrice" readonly/>
+        </div>
+
+        @* Total Price *@
+        <div class="col-md-3">
+            <label>Total Price</label>
+            <input type="number" class="form-control" id="TotalPrice" readonly/>
+        </div>
+
+        <div class="col-md-12 mt-2">
+
+            <button type="button" class="btn btn-success float-right ml-2" id="Reset">
+                Reset
+            </button>
+
+            <button type="button" class="btn btn-success float-right" id="AddToBill">
+                Add To Bill
+            </button>
+
+
+        </div>
+    </div>
+
+
+
+    @* DataTable *@
+    <div class="row p-2">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <td>Item</td>
+                    <td>Quantity</td>
+                    <td>Price/Unit</td>
+                    <td>Amount</td>
+                    <td>Remove</td>
+                </tr>
+            </thead>
+
+            <tbody id="ProductListDataTable">
+                
+            </tbody>
+        </table>
+    </div>
+
+    <hr />
+
+    @* Summary *@
+    <div class="row mt-2">
+        <div class="col-md-3">
+            <label>Sub Total</label>
+            <input type="number" class="form-control" id="SubTotal" name="SubTotal" readonly />
+        </div>
+
+        <div class="col-md-3">
+            <label>Discount</label>
+            <input type="number" class="form-control" id="Discount" name="Discount" value="0" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Vat</label>
+            <input type="number" class="form-control" id="Vat" name="Vat" value="12" readonly/>
+        </div>
+
+        <div class="col-md-3">
+            <label>Grand Total</label>
+            <input type="number" class="form-control" id="GrandTotal" name="GrandTotal" readonly />
+        </div>
+
+        <div class="col-md-12 mt-3">
+            <button type="submit" class="btn btn-info">
+                Amount Paid & Add New Bill
+            </button>
+        </div>
+    </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            // Define Some Global Variable. When The DOM is Ready Variables are Initialized.
+            var SubTotal    = 0;
+            var GrandTotal = 0
+            var DiscountAmount = 0;
+            var TaxAmount = 12;
+
+            var date = new Date();
+
+            var TodayDate = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+            $('#TodayDate').val(TodayDate);
+
+            var CurrentTime = date.getHours() + ":" + date.getMinutes();
+            $('#CurrentTime').val(CurrentTime);
+
+
+            // Get Product Details
+            $('#ProductId').change(function () {
+                var ProductId = $(this).val();
+
+                // When Product is Changed then Empty Quantity & Total Price;
+                $('#Quantity').val('');
+                $('#TotalPrice').val('');
+
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("GetProductInfo")",
+                    dataType: "json",
+                    data: { ProductId: ProductId },
+                    success: function (response) {
+                        $('#UnitPrice').val(response.value.price);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                })
+
+            });
+
+            // Calculate Total Price Based on Quantity
+            $('#Quantity').keyup(function () {
+                const Quantity = $(this).val();
+                const UnitPrice = $('#UnitPrice').val();
+                const TotalPrice = parseInt(Quantity) * parseInt(UnitPrice);
+
+                $('#TotalPrice').val(TotalPrice);
+            });
+
+            // Reset
+            $('#Reset').click(function () {
+                window.location.reload();
+            });
+
+            
+            // Add To Bill Action
+            $('#AddToBill').click(function () {
+
+                if (!$('#ProductId').val()) {
+                    swal("Error", "Please Select a Product", "error");
+                    return false;
+                }
+
+                if (!$('#Quantity').val() || $('#Quantity').val() == 0) {
+                    swal("Error", "Quantity can't be Null or 0", "error");
+                    return false;
+                }
+
+                // If There was no Validation Error then Add Data into ProductListDataTable
+
+                const ProductId     = $('#ProductId').val();
+                const ProductName   = $('#ProductId option:selected').text();
+                const UnitPrice     = $('#UnitPrice').val();
+                const Quantity      = $('#Quantity').val();
+                const TotalPrice    = $('#TotalPrice').val();
+
+                IncrementSubTotal(TotalPrice);
+                
+
+                $('#ProductListDataTable').append(
+                    `   <tr>
+
+                        <td>${ProductName}</td>
+                        <input type="hidden" value="${ProductId}" name="ProductId" />
+
+                        <td>${UnitPrice}</td>
+                        <input type="hidden" value="${UnitPrice}" name="UnitPrice" />
+
+                        <td>${Quantity}</td>
+                        <input type="hidden" value="${Quantity}" name="Quantity" />
+
+                        <td>${TotalPrice}</td>
+                        <input type="hidden" value="${TotalPrice}" name="TotalPrice" />
+
+                        <td>
+                            <button class="btn btn-danger btn-sm" id="RemoveProductFromList">X</button>
+                        </td>
+
+                        </tr>
+                    `
+                );
+            });
+
+            // Remove Product From List
+            $("#ProductListDataTable").on("click", "#RemoveProductFromList", function () {
+                $(this).closest("tr").remove();
+                DecrementSubTotal( $(this).closest("tr").find("td:eq(3)").text() )
+            });
+
+
+            // Increment SubTotal
+            function IncrementSubTotal(Amount)
+            {
+                SubTotal = parseInt(SubTotal) + parseInt(Amount);
+                $('#SubTotal').val(SubTotal);
+                DiscountCalculation(DiscountAmount);
+            }
+
+            // Decrement SubTotal
+            function DecrementSubTotal(Amount)
+            {
+                SubTotal = parseInt(SubTotal) - parseInt(Amount);
+                $('#SubTotal').val(SubTotal);
+                DiscountCalculation(DiscountAmount);
+            }
+
+            // Discount OnKeyUp Event
+            $('#Discount').keyup(function () {
+                DiscountAmount = $(this).val();
+
+                if (!DiscountAmount) {
+                    swal("Error", "Discount Amount Can't be null", "error");
+                    return false;
+                }
+                DiscountCalculation(DiscountAmount);
+            });
+
+
+            // Discount & Vat Calculation Function
+            function DiscountCalculation(DiscountAmount)
+            {
+                const SubTotalAmount = $('#SubTotal').val();
+
+                const VatAmount = (parseInt(SubTotalAmount) * parseInt(TaxAmount)) / 100;
+
+                const DiscountValue = (parseInt(SubTotalAmount) * parseInt(DiscountAmount)) / 100;
+
+                const GrandTotal = (parseInt(SubTotalAmount) - (parseInt(VatAmount) + parseInt(DiscountValue)));
+                $('#GrandTotal').val(GrandTotal);
+            }
+            
+        })
+
+        
+    </script>
+}
+
+
+

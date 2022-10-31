@@ -1,0 +1,44 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Invoice List";
+}
+
+<h5>Invoice List</h5>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <td>Date</td>
+                    <td>Invoice Code</td>
+                    <td>Sub Total</td>
+                    <td>Discount(%)</td>
+                    <td>Vat/Tax(%)</td>
+                    <td>Grand Total</td>
+                    <td>Action</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (int i = 0; i < Model.Rows.Count; i++)
+                 {
+                    <tr>
+                        <td>@Model.Rows[i][1]</td>
+                        <td>@Model.Rows[i][2]</td>
+                        <td>@Model.Rows[i][3]</td>
+                        <td>@Model.Rows[i][4]</td>
+                        <td>@Model.Rows[i][5]</td>
+                        <td>@Model.Rows[i][6]</td>
+                        <td>
+                            <a href="@Url.Action("ViewInvoice", "POS", new { @id=Model.Rows[i][0]})" class="btn btn-info btn-sm">
+                                View Invoice
+                            </a>
+                        </td>
+                    </tr>
+                                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

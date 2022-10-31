@@ -1,0 +1,34 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "ViewInvoice";
+}
+
+<h6>View Invoice Details</h6>
+
+<span class="badge badge-info mr-3">Product Details</span>
+
+<div class="row">
+
+    @* Invoice Purchase Details Data *@
+
+    <div class="col-md-12">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>ProductName</td>
+                <td>Unit/Price</td>
+                <td>Quantity</td>
+                <td>Total</td>
+            </tr>
+            @for(int i = 0; i < Model.Rows.Count; i++)
+            {
+                <tr>
+                    <td>@Model.Rows[i][3]</td>
+                    <td>@Model.Rows[i][4]</td>
+                    <td>@Model.Rows[i][5]</td>
+                    <td>@Model.Rows[i][6]</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
