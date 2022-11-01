@@ -37,7 +37,7 @@
 
         @* Product Name *@
         <div class="col-md-3">
-            <label>Item</label>
+            <label>Product</label>
             <select class="form-control" id="ProductId">
                 <option selected disabled>Select Product</option>
                 @for (int i = 0; i < Model.Rows.Count; i++)
@@ -97,6 +97,10 @@
             <tbody id="ProductListDataTable">
                 
             </tbody>
+
+            <tbody id="testData">
+
+            </tbody>
         </table>
     </div>
 
@@ -129,6 +133,12 @@
                 Amount Paid & Add New Bill
             </button>
         </div>
+
+        <div class="col-md-12 mt-3">
+            <button type="button" id="testBtn" class="btn btn-info">
+                Testvfdsvfd
+            </button>
+        </div>
     </div>
     }
 </div>
@@ -143,6 +153,9 @@
             var DiscountAmount = 0;
             var TaxAmount = 12;
 
+            var ProductDataSetDetails = [];
+
+            
             var date = new Date();
 
             var TodayDate = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
@@ -167,6 +180,8 @@
                     data: { ProductId: ProductId },
                     success: function (response) {
                         $('#UnitPrice').val(response.value.price);
+
+                        //CheckProductIsInList();
                     },
                     error: function (error) {
                         console.log(error);
@@ -174,6 +189,39 @@
                 })
 
             });
+
+
+            // Push Product Dataset Details Data
+            function PushProductDataSetDetails()
+            {
+                const ProductId     = $('#ProductId').val();
+                const ProductName   = $('#ProductId option:selected').text();
+                const UnitPrice     = $('#UnitPrice').val();
+                var Quantity      = $('#Quantity').val();
+                const TotalPrice    = $('#TotalPrice').val();
+                const TP = UnitPrice * Quantity;
+
+                for(var i = 0; i < ProductDataSetDetails.length ; i++)
+                {
+                    if(ProductDataSetDetails[i][0] == ProductId)
+                    {
+                        const NewQnty = parseInt(Quantity) + parseInt(ProductDataSetDetails[i][3]);
+                        ProductDataSetDetails.splice([i][0], 1);
+                        ProductDataSetDetails.push([ProductId, ProductName, UnitPrice, NewQnty, TP]);
+                        
+                        IncrementSubTotal(TotalPrice);
+                        ShowData();
+                        
+                        return false;
+                    }
+                }
+
+                ProductDataSetDetails.push([ProductId, ProductName, UnitPrice, Quantity, TP]);
+
+                IncrementSubTotal(TotalPrice);
+                ShowData();
+            }
+
 
             // Calculate Total Price Based on Quantity
             $('#Quantity').keyup(function () {
@@ -189,7 +237,7 @@
                 window.location.reload();
             });
 
-            
+
             // Add To Bill Action
             $('#AddToBill').click(function () {
 
@@ -204,39 +252,55 @@
                 }
 
                 // If There was no Validation Error then Add Data into ProductListDataTable
-
-                const ProductId     = $('#ProductId').val();
-                const ProductName   = $('#ProductId option:selected').text();
-                const UnitPrice     = $('#UnitPrice').val();
-                const Quantity      = $('#Quantity').val();
-                const TotalPrice    = $('#TotalPrice').val();
-
-                IncrementSubTotal(TotalPrice);
+                //const ProductId = $('#ProductId').val();
+                //const ProductName = $('#ProductId option:selected').text();
+                //const UnitPrice = $('#UnitPrice').val();
+                //const Quantity = $('#Quantity').val();
+                //const TotalPrice = $('#TotalPrice').val();
+                PushProductDataSetDetails()
+                //var chk = PushProductDataSetDetails();                
+                //if(chk === false) {
+                //    ShowData();
+                //    return false;
+                //}
+                  
                 
 
-                $('#ProductListDataTable').append(
+                //IncrementSubTotal(TotalPrice);
+                //ShowData();
+            });
+
+            function ShowData()
+            {
+                $('#ProductListDataTable').empty();
+                $.each(ProductDataSetDetails, function(index, value){
+                     $('#ProductListDataTable').append(
                     `   <tr>
 
-                        <td>${ProductName}</td>
-                        <input type="hidden" value="${ProductId}" name="ProductId" />
+                        <td>${value[1]}</td>
+                        <input type="hidden" value="${value[0]}" name="ProductId" />
 
-                        <td>${UnitPrice}</td>
-                        <input type="hidden" value="${UnitPrice}" name="UnitPrice" />
+                        <td>${value[3]}</td>
+                        <input type="hidden" value="${value[3]}" name="Quantity" />
 
-                        <td>${Quantity}</td>
-                        <input type="hidden" value="${Quantity}" name="Quantity" />
+                        <td>${value[2]}</td>
+                        <input type="hidden" value="${value[2]}" name="UnitPrice" />
 
-                        <td>${TotalPrice}</td>
-                        <input type="hidden" value="${TotalPrice}" name="TotalPrice" />
+                        <td>${value[4]}</td>
+                        <input type="hidden" value="${value[4]}" name="TotalPrice" />
 
                         <td>
                             <button class="btn btn-danger btn-sm" id="RemoveProductFromList">X</button>
                         </td>
 
+
                         </tr>
                     `
                 );
-            });
+                })
+            }
+
+            
 
             // Remove Product From List
             $("#ProductListDataTable").on("click", "#RemoveProductFromList", function () {

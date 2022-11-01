@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ASP.NET MVC\\InvoiceSystem\\InvoiceSystem\\InvoiceSystem.csproj": {}
+    "E:\\Software's\\ASP.NET\\InterviewTask\\asp.net\\InvoiceSystem\\InvoiceSystem.csproj": {}
   },
   "projects": {
-    "D:\\ASP.NET MVC\\InvoiceSystem\\InvoiceSystem\\InvoiceSystem.csproj": {
+    "E:\\Software's\\ASP.NET\\InterviewTask\\asp.net\\InvoiceSystem\\InvoiceSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ASP.NET MVC\\InvoiceSystem\\InvoiceSystem\\InvoiceSystem.csproj",
+        "projectUniqueName": "E:\\Software's\\ASP.NET\\InterviewTask\\asp.net\\InvoiceSystem\\InvoiceSystem.csproj",
         "projectName": "InvoiceSystem",
-        "projectPath": "D:\\ASP.NET MVC\\InvoiceSystem\\InvoiceSystem\\InvoiceSystem.csproj",
-        "packagesPath": "C:\\Users\\Nazib\\.nuget\\packages\\",
-        "outputPath": "D:\\ASP.NET MVC\\InvoiceSystem\\InvoiceSystem\\obj\\",
+        "projectPath": "E:\\Software's\\ASP.NET\\InterviewTask\\asp.net\\InvoiceSystem\\InvoiceSystem.csproj",
+        "packagesPath": "C:\\Users\\nazib\\.nuget\\packages\\",
+        "outputPath": "E:\\Software's\\ASP.NET\\InterviewTask\\asp.net\\InvoiceSystem\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Nazib\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nazib\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -55,7 +55,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -67,7 +68,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.413\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

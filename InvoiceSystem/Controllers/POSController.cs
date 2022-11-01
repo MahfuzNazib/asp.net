@@ -13,7 +13,7 @@ namespace InvoiceSystem.Controllers
 {
     public class POSController : Controller
     {
-        string Str = @"Data Source=DESKTOP-8MIOL09\MSSQLSERVER2008;Initial Catalog=InvoiceDB;Integrated Security=True";
+        string Str = @"Data Source=MAHFUZ-NAZIB;Initial Catalog=InvoiceDB;Integrated Security=True";
 
         // GET: POSController
         public ActionResult Index()

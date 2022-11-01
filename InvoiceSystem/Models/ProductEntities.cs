@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace InvoiceSystem.Models
 {
-    public class ProductModel
+    public class ProductEntities
     {
-        [Required]
-        public int ProductId { get; set; }
-
         [Required]
         public string ProductName { get; set; }
 
